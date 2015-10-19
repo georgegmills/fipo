@@ -15,9 +15,7 @@ class Resource(models.Model):
     unit = models.ForeignKey(Unit)
     units_per_pack = models.PositiveSmallIntegerField()
     packs_per_case = models.PositiveSmallIntegerField()
-
     allergens = models.ManyToManyField(Allergen)
-    
 
     def has_allergen(self, allergen):
         for a in self.allergens.all():
@@ -28,9 +26,14 @@ class Resource(models.Model):
     def __str__(self):
         return self.name
 
+class MealResourceRelationship(models.Model):
+    resource = models.ForeignKey(Resource)
+    meal = models.ForeignKey(Meal)
+    units_per_person = models.DecimalField(decimal_places=2)
+
 class Meal(models.Model):
     name = models.CharField(max_length=200)
-    resources = models.ManyToManyField(Resource)
+    resources = models.ManyToManyField(Resource, through='MealResourceRelationship')
 
     def get_allergens(self):
         allergens = set()
@@ -48,10 +51,19 @@ class Meal(models.Model):
 
     def __str__(self):
         return self.name
+
+class MealTime(models.Model):
+    name = models.CharField(max_lenght=200)
+
+class MenuMealRelationship(models.Model):
+    meal = models.ForeignKey(Meal)
+    menu = models.ForeignKey(Menu)
+    meal_time = models.ForeignKey(MealTime)
+    day = models.PositiveSmallIntegerField()
     
 class Menu(models.Model):
     name = models.CharField(max_length=200)
-    meals = models.ManyToManyField(Meal)
+    meals = models.ManyToManyField(Meal, through='MenuMealRelationship')
 
     def get_allergens(self):
         allergens = set()
