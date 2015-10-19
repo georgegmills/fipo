@@ -3,13 +3,15 @@ from sets import Set
 
 # Create your models here.
 
-class Alergen(models.Model):
+class Allergen(models.Model):
     name= models.CharField(max_length=200)
 
 # allow repeat of units rather than text field, easier interface
 class Unit(models.Model):
     name = models.CharField(max_length=200)
 
+# a resource is a food item. e.g. "Bananas" 
+# resources have a  unit specifies in what units the resource is bought e.g. Bananas Unit = ct or count, water = gal 
 class Resource(models.Model):
     name = models.CharField(max_length=200)
     unit = models.ForeignKey(Unit)
@@ -17,6 +19,8 @@ class Resource(models.Model):
     packs_per_case = models.PositiveSmallIntegerField()
     allergens = models.ManyToManyField(Allergen)
 
+
+# has_allergen is a function that checks for a specific allergen in a resource
     def has_allergen(self, allergen):
         for a in self.allergens.all():
             if a == allergen:
@@ -26,14 +30,11 @@ class Resource(models.Model):
     def __str__(self):
         return self.name
 
-class MealResourceRelationship(models.Model):
-    resource = models.ForeignKey(Resource)
-    meal = models.ForeignKey(Meal)
-    units_per_person = models.DecimalField(decimal_places=2)
-
+#Meal is a collection of resources to make a particular food dish i.e. Meal = Mac and Cheese, Resources = Cheese, pasta ... etc
 class Meal(models.Model):
     name = models.CharField(max_length=200)
     resources = models.ManyToManyField(Resource, through='MealResourceRelationship')
+    recipe = models.TextField(default='')
 
     def get_allergens(self):
         allergens = set()
@@ -52,14 +53,13 @@ class Meal(models.Model):
     def __str__(self):
         return self.name
 
-class MealTime(models.Model):
-    name = models.CharField(max_lenght=200)
-
-class MenuMealRelationship(models.Model):
+class MealResourceRelationship(models.Model):
+    resource = models.ForeignKey(Resource)
     meal = models.ForeignKey(Meal)
-    menu = models.ForeignKey(Menu)
-    meal_time = models.ForeignKey(MealTime)
-    day = models.PositiveSmallIntegerField()
+    units_per_person = models.DecimalField(max_digits=19,decimal_places=2)
+
+class MealTime(models.Model):
+    name = models.CharField(max_length=200)
     
 class Menu(models.Model):
     name = models.CharField(max_length=200)
@@ -81,6 +81,14 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class MenuMealRelationship(models.Model):
+    meal = models.ForeignKey(Meal)
+    menu = models.ForeignKey(Menu)
+    meal_time = models.ForeignKey(MealTime)
+    day = models.PositiveSmallIntegerField()
+
 
 class Trip(models.Model):
     name = models.CharField(max_length=200)
