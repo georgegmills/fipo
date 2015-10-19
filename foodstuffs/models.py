@@ -6,9 +6,18 @@ from sets import Set
 class Allergen(models.Model):
     name = models.CharField(max_length=200)
 
+# allow repeat of units rather than text field, easier interface
+class Unit(models.Model):
+    name = models.CharField(max_length=200)
+
 class Resource(models.Model):
     name = models.CharField(max_length=200)
+    unit = models.ForeignKey(Unit)
+    units_per_pack = models.PositiveSmallIntegerField()
+    packs_per_case = models.PositiveSmallIntegerField()
+
     allergens = models.ManyToManyField(Allergen)
+    
 
     def has_allergen(self, allergen):
         for a in self.allergens.all():
