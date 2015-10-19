@@ -4,11 +4,17 @@ from sets import Set
 # Create your models here.
 
 class Allergen(models.Model):
-    name= models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 # allow repeat of units rather than text field, easier interface
 class Unit(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 # a resource is a food item. e.g. "Bananas" 
 # resources have a  unit specifies in what units the resource is bought e.g. Bananas Unit = ct or count, water = gal 
@@ -18,7 +24,6 @@ class Resource(models.Model):
     units_per_pack = models.PositiveSmallIntegerField()
     packs_per_case = models.PositiveSmallIntegerField()
     allergens = models.ManyToManyField(Allergen)
-
 
 # has_allergen is a function that checks for a specific allergen in a resource
     def has_allergen(self, allergen):
@@ -60,6 +65,9 @@ class MealResourceRelationship(models.Model):
 
 class MealTime(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
     
 class Menu(models.Model):
     name = models.CharField(max_length=200)
@@ -88,7 +96,6 @@ class MenuMealRelationship(models.Model):
     menu = models.ForeignKey(Menu)
     meal_time = models.ForeignKey(MealTime)
     day = models.PositiveSmallIntegerField()
-
 
 class Trip(models.Model):
     name = models.CharField(max_length=200)
