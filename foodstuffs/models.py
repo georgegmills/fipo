@@ -1,13 +1,28 @@
 from django.db import models
+from sets import Set
 
 # Create your models here.
 
 class Alergen(models.Model):
     name= models.CharField(max_length=200)
 
+# allow repeat of units rather than text field, easier interface
+class Unit(models.Model):
+    name = models.CharField(max_length=200)
+
 class Resource(models.Model):
     name = models.CharField(max_length=200)
-    alergens = models.ManyToManyField(Alergen)
+    unit = models.ForeignKey(Unit)
+    units_per_pack = models.PositiveSmallIntegerField()
+    packs_per_case = models.PositiveSmallIntegerField()
+
+    allergens = models.ManyToManyField(Allergen)
+    
+    def has_allergen(self, allergen):
+        for a in self.allergens.all():
+            if a == allergen:
+                return true
+        return false
     
     def __str__(self):
         return self.name
@@ -16,14 +31,19 @@ class Meal(models.Model):
     name = models.CharField(max_length=200)
     resources = models.ManyToManyField(Resource)
 
-    def get_alergens(self):
-        alergens = []
+    def get_allergens(self):
+        allergens = set()
         for resource in self.resources.all():
-            alergens.append(resource.alergens)
-        return 
-            
+            allergens |= set(resource.allergens)
+        return list(allergens)
 
-
+    # fastest to look through one by one rather than using get_allergens
+    # allows short-circuiting once found
+    def has_allergen(self, allergen):
+        for resource in self.resources.all():
+            if resource.allergens.all().count(allergen) > 0:
+                return true
+        return false
 
     def __str__(self):
         return self.name
@@ -32,12 +52,19 @@ class Menu(models.Model):
     name = models.CharField(max_length=200)
     meals = models.ManyToManyField(Meal)
 
-    def get_meal_alergens(self):
+    def get_allergens(self):
+        allergens = set()
         for meal in self.meals.all():
+            allergens |= set(meal.get_allergens())
+        return list(allergens)
 
-            #return all alergens associated in resource. Add them to a list? 
-
-
+    # fastest to look through one by one rather than using get_allergens
+    # allows short-circuiting once found
+    def has_allergen(self, allergen):
+        for meal in self.meals.all():
+            if meal.get_allergens().count(allergen) > 0:
+                return true
+        return false
 
     def __str__(self):
         return self.name
