@@ -3,8 +3,8 @@ from sets import Set
 
 # Create your models here.
 
-class Allergen(models.Model):
-    name = models.CharField(max_length=200)
+class Alergen(models.Model):
+    name= models.CharField(max_length=200)
 
 # allow repeat of units rather than text field, easier interface
 class Unit(models.Model):
