@@ -5,7 +5,6 @@ from sets import Set
 
 class Allergen(models.Model):
     name = models.CharField(max_length=200)
-
     def __str__(self):
         return self.name
 
@@ -17,15 +16,17 @@ class Unit(models.Model):
         return self.name
 
 # a resource is a food item. e.g. "Bananas" 
-# resources have a  unit specifies in what units the resource is bought e.g. Bananas Unit = ct or count, water = gal 
+# resources have a  unit specifies in what units 
+# the resource is bought e.g. Bananas Unit = ct or count, water = gal 
 class Resource(models.Model):
     name = models.CharField(max_length=200)
     unit = models.ForeignKey(Unit)
     units_per_pack = models.PositiveSmallIntegerField()
     packs_per_case = models.PositiveSmallIntegerField()
-    allergens = models.ManyToManyField(Allergen)
+    allergens = models.ManyToManyField(Allergen, blank=True)
 
-# has_allergen is a function that checks for a specific allergen in a resource
+# has_allergen is a function that checks for 
+# a specific allergen in a resource
     def has_allergen(self, allergen):
         for a in self.allergens.all():
             if a == allergen:
@@ -35,7 +36,8 @@ class Resource(models.Model):
     def __str__(self):
         return self.name
 
-#Meal is a collection of resources to make a particular food dish i.e. Meal = Mac and Cheese, Resources = Cheese, pasta ... etc
+# Meal is a collection of resources to make a particular 
+# food dish i.e. Meal = Mac and Cheese, Resources = Cheese, pasta ... etc
 class Meal(models.Model):
     name = models.CharField(max_length=200)
     resources = models.ManyToManyField(Resource, through='MealResourceRelationship')
@@ -62,6 +64,7 @@ class MealResourceRelationship(models.Model):
     resource = models.ForeignKey(Resource)
     meal = models.ForeignKey(Meal)
     units_per_person = models.DecimalField(max_digits=19,decimal_places=2)
+    unit = models.ForeignKey(Unit, default="")
 
 class MealTime(models.Model):
     name = models.CharField(max_length=200)
