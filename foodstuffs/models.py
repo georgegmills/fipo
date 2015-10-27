@@ -64,7 +64,6 @@ class MealResourceRelationship(models.Model):
     resource = models.ForeignKey(Resource)
     meal = models.ForeignKey(Meal)
     units_per_person = models.DecimalField(max_digits=19,decimal_places=2)
-    unit = models.ForeignKey(Unit, default="")
 
 class MealTime(models.Model):
     name = models.CharField(max_length=200)

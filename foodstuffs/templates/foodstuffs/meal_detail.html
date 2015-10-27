@@ -1,5 +1,14 @@
-<h1> Edit Meal <h1>
+<h1>{{ meal.name }}</h1>
+<a href= "{% url 'meal_edit' meal.id %}">Edit Meal</a>
 
-<h2>{{meal.name}}</h2>
+<h2>Resources Required</h2>
+<ul>
+  {% for resource in meal.mealresourcerelationship_set.all %}
+  <li>{{ resource.resource.name }}: {{ resource.units_per_person }} {{ resource.resource.unit }} per person</li>
+  {% endfor %}
+</ul>
+
+<h2>Recipe</h2>
+<p>{{ meal.recipe }}</p>
 
 
