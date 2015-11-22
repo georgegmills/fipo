@@ -31,7 +31,7 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
         meal = Meal()
 
     if request.POST:
-       form = MealForm(request.POST)
+       form = MealForm(request.POST,instance=meal)
        if form.is_valid():
             meal_mod = form.save(commit=False)
             meal_mod.save()
@@ -48,7 +48,7 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
             redirect_url = reverse('meal_list')
             return HttpResponseRedirect(redirect_url)
     else:
-        form = MealForm()
+        form = MealForm(instance=meal)
 
     args = {}
     args.update(csrf(request))
