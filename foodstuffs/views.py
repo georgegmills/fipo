@@ -7,6 +7,7 @@ from django.views import generic
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from .forms import MealForm
+from django import forms
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,34 +26,46 @@ class MealDetailView(generic.DetailView):
 # Form Views
 # http://wiki.ddenis.com/index.php?title=Django,_add_and_edit_object_together_in_the_same_form
 def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
+    # ADDED: Created an inline formset factory for the meal resource relationship
+    MealResourceFormset = forms.inlineformset_factory(Meal, Meal.resources.through, exclude=[], extra=1)
+
     if id:
         meal = get_object_or_404(Meal, pk=pk)
     else:
         meal = Meal()
 
     if request.POST:
-       form = MealForm(request.POST,instance=meal)
-       if form.is_valid():
-            meal_mod = form.save(commit=False)
+       meal_form = MealForm(request.POST, instance=meal)
+       MealResourceForm = MealResourceFormset(request.POST, request.FILES, instance=meal)
+
+       if meal_form.is_valid() and MealResourceForm.is_valid():
+            meal_mod = meal_form.save(commit=False)
             meal_mod.save()
-            
+
             # remove existing resources
+
             meal_mod.resources.clear()
-            for resource in form.cleaned_data.get('resources'):
-                meal_resource_rel = MealResourceRelationship(meal=meal_mod, 
-                                                             resource=resource,
-                                                             units_per_person=1)
-                meal_resource_rel.save()
-            # messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))
-            # If the save was successful, redirect to another page
+
+            for meal_resource_relationship in MealResourceForm:
+                meal_resource_relationship.meal = pk
+                meal_resource_relationship.save()
+
+
+
+                #messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))            
+            
+            # If the save was successful, redirect to another page                                   
             redirect_url = reverse('meal_list')
             return HttpResponseRedirect(redirect_url)
     else:
-        form = MealForm(instance=meal)
+        # ADDED/EDITED: create both the meal form and resource formsets
+        meal_form = MealForm(instance=meal)
+        MealResourceForm = MealResourceFormset(instance=meal)                                                         
 
     args = {}
     args.update(csrf(request))
-    args['form'] = form
+    args['form'] = meal_form
+    args['formset'] = MealResourceForm
     args['meal'] = meal
     return render_to_response(template_name, args)
     
