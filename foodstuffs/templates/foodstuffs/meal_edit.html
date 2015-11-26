@@ -5,9 +5,14 @@
 {% endif %}
 
 {% csrf_token %}
+
+{% include "foodstuffs/form_snippet.html" with form=form %}
+
+{{ formset.management_form }}
 <ul>
-{{form.as_ul}}
-{{formset.as_ul}}
+{% for form in formset %}
+  <li>{% include "foodstuffs/form_snippet.html" with form=form %}</li>
+{% endfor %}
 </ul>
 
 {% if meal.pk %}
