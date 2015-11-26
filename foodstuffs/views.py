@@ -36,21 +36,13 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
 
     if request.POST:
        meal_form = MealForm(request.POST, instance=meal)
-       MealResourceForm = MealResourceFormset(request.POST, request.FILES, instance=meal)
+       resource_formset = MealResourceFormset(request.POST, request.FILES, instance=meal)
 
-       if meal_form.is_valid() and MealResourceForm.is_valid():
+       if meal_form.is_valid() and resource_formset.is_valid():
             meal_mod = meal_form.save(commit=False)
             meal_mod.save()
-
-            # remove existing resources
-
-            meal_mod.resources.clear()
-
-            for meal_resource_relationship in MealResourceForm:
-                meal_resource_relationship.meal = pk
-                meal_resource_relationship.save()
-
-
+            resource_formset.save()
+            
 
                 #messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))            
             
@@ -60,12 +52,12 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
     else:
         # ADDED/EDITED: create both the meal form and resource formsets
         meal_form = MealForm(instance=meal)
-        MealResourceForm = MealResourceFormset(instance=meal)                                                         
+        resource_form = MealResourceFormset(instance=meal)                                                         
 
     args = {}
     args.update(csrf(request))
     args['form'] = meal_form
-    args['formset'] = MealResourceForm
+    args['formset'] = resource_formset
     args['meal'] = meal
     return render_to_response(template_name, args)
     
