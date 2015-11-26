@@ -10,6 +10,7 @@ from django.views import generic
 from .models import Resource, Unit, Allergen, Meal, MealTime, Menu
 from .models import MealResourceRelationship,MenuMealRelationship,Trip
 from .forms import MealForm
+from django import forms
 import logging
 
 logger = logging.getLogger(__name__)
