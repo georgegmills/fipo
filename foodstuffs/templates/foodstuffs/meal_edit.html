@@ -1,8 +1,19 @@
-<form action="{% url 'meal_edit' meal.id %}" method="post">{% csrf_token %}
+{% if meal.pk %}
+<form action="{% url 'meal_edit' meal.pk %}" method="post">
+{% else %}
+<form action="{% url 'meal_add' %}" method="post">
+{% endif %}
+
+{% csrf_token %}
 <ul>
 {{form.as_ul}}
 {{formset.as_ul}}
 </ul>
 
+{% if meal.pk %}
+<input type="submit" name="submit" value="Save Meal">
+{% else %}
 <input type="submit" name="submit" value="Create Meal">
+{% endif %}
+
 </form>
