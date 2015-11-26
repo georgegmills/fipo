@@ -4,4 +4,7 @@ from .models import MealResourceRelationship, Meal
 class MealForm(forms.ModelForm):
     class Meta:
         model = Meal
-        fields = '__all__'
+        fields = ['name', 'recipe']
+        # resources should be handled by fieldset
+
+
