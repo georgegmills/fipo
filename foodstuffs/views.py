@@ -1,11 +1,14 @@
-from django.shortcuts import get_object_or_404,render, render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib import messages
-from .models import Resource, Unit, Allergen, Meal, MealTime, Menu
-from .models import MealResourceRelationship,MenuMealRelationship,Trip
-from django.views import generic 
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404,render, render_to_response
+from django import forms
+from django.contrib import messages
+from django.utils.translation import ugettext as _
+from django.views import generic 
+
+from .models import Resource, Unit, Allergen, Meal, MealTime, Menu
+from .models import MealResourceRelationship,MenuMealRelationship,Trip
 from .forms import MealForm
 from django import forms
 import logging
@@ -26,33 +29,36 @@ class MealDetailView(generic.DetailView):
 # Form Views
 # http://wiki.ddenis.com/index.php?title=Django,_add_and_edit_object_together_in_the_same_form
 def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
-    # ADDED: Created an inline formset factory for the meal resource relationship
     MealResourceFormset = forms.inlineformset_factory(Meal, Meal.resources.through, exclude=[], extra=1)
 
-    if id:
+    if pk:
         meal = get_object_or_404(Meal, pk=pk)
     else:
         meal = Meal()
 
+    # on POST, save
     if request.POST:
        meal_form = MealForm(request.POST, instance=meal)
-       resource_formset = MealResourceFormset(request.POST, request.FILES, instance=meal)
-
+       resource_formset = MealResourceFormset(request.POST, instance=meal)
        if meal_form.is_valid() and resource_formset.is_valid():
-            meal_mod = meal_form.save(commit=False)
-            meal_mod.save()
-            resource_formset.save()
-            
+           # save first w/ commit=false, then normal save to avoid saving m2m
+           # See: https://docs.djangoproject.com/en/1.8/topics/forms/modelforms/#the-save-method
+           meal_mod = meal_form.save(commit=False)
+           meal_mod.save()
 
-                #messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))            
             
-            # If the save was successful, redirect to another page                                   
-            redirect_url = reverse('meal_list')
-            return HttpResponseRedirect(redirect_url)
+           # save resources
+           resource_formset.save()
+           
+           messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))
+           
+           # If the save was successful, redirect to another page
+           redirect_url = reverse('meal_list')
+           return HttpResponseRedirect(redirect_url)
     else:
-        # ADDED/EDITED: create both the meal form and resource formsets
         meal_form = MealForm(instance=meal)
-        resource_form = MealResourceFormset(instance=meal)                                                         
+        resource_formset = MealResourceFormset(instance=meal)
+
 
     args = {}
     args.update(csrf(request))
