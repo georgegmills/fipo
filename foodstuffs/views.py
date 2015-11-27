@@ -28,6 +28,8 @@ class MealDetailView(generic.DetailView):
     
 # Form Views
 # http://wiki.ddenis.com/index.php?title=Django,_add_and_edit_object_together_in_the_same_form
+
+
 def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
     MealResourceFormset = forms.inlineformset_factory(Meal, Meal.resources.through, exclude=[], extra=1)
 
@@ -67,3 +69,37 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
     args['meal'] = meal
     return render_to_response(template_name, args)
     
+
+
+class ResourceView(generic.ListView):
+    def get_queryset(self):
+        return Resource.objects.all()    
+
+class ResourceDetailView(generic.DetailView):
+    model=Resource
+    template_name = 'foodstuffs/resource_detail.html'
+
+def resource_edit(request, pk=None,template_name='foodstuffs/resource_edit'):
+    if pk:
+        resource = get_object_or_404(Resource, pk=pk)
+    else:
+        resource = Resource()
+
+    # on Post, save
+    
+    if request.POST:
+        resource_form = ResourceForm(request.POST, instance=resource)
+        if resource_form.is_valid():
+            resource_mod = meal_form.save(commit=False)
+            meal_mod.save()
+
+            redirect_url = reverse('resource_list')
+            return HttpResponseRedirect(redirect_url)
+    else:
+        resource_form = ResourceForm(instance=meal)
+
+    args = {}
+    args.update(csrf(request))
+    args['form'] = resource_form
+    args['resource'] = resource
+    return render_to_response(template_name, args)

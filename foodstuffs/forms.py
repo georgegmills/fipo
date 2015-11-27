@@ -6,3 +6,8 @@ class MealForm(forms.ModelForm):
     class Meta:
         model = Meal
         fields = ['name', 'recipe']
+
+class ResourceForm(forms.ModelForm):
+    class Meta:
+        model = Resource
+        fields = '__all__'
