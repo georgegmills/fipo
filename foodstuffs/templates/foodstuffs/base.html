@@ -1,0 +1,21 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <title>FIPO</title>
+</head>
+
+<body>
+<ul>
+<a href= "{% url 'resource_add' %}"> Add Resources </a>
+<a href= "{% url 'resource_list' %}"> View Resources </a>
+<a href= "{% url 'meal_add' %}"> Add a Meal </a>
+<a href= "{% url 'meal_list' %}"> View Meals </a>
+<ul>
+
+  {% load staticfiles %}
+  <a href= "{% url 'index' %}"> <img src="../../../static/foodstuffs/images/Logo.png" height="60" width="60"> </a>
+    <div id="content">
+        {% block content %}{% endblock %} 
+    </div>
+</body>
+ </html>

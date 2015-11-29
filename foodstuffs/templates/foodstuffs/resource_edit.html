@@ -1,0 +1,22 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+
+{% if resource.pk %}
+<form action="{% url 'resource_edit' resource.pk %}" method="post">
+{% else %}
+<form action="{% url 'resource_add' %}" method="post">
+{% endif %}
+
+{% csrf_token %}
+
+{% include "foodstuffs/form_snippet.html" with form=form %}
+
+{% if resource.pk %}
+<input type="submit" name="submit" value="Save Resource">
+{% else %}
+<input type="submit" name="submit" value="Create Resource">
+{% endif %}
+
+</form>
+{% endblock %}

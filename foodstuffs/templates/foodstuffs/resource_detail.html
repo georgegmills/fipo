@@ -1,0 +1,26 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+
+
+
+<h1>{{ resource.name }}</h1>
+<a href= "{% url 'resource_edit' resource.pk %}">Edit Resource</a>
+
+<h3>Allergens:</h3>
+<ul>
+{% for allergen in resource.allergens.all %}
+<li> {{allergen.name}} </li>
+{% endfor %}
+</ul>
+
+<br>
+
+<h2>Details:</h2>
+<ul>
+<li> Unit: {{ resource.unit }} </li>
+<li> Units per Pack: {{ resource.units_per_pack }} </li>
+<li> Packs per Case: {{ resource.packs_per_case }} </li>
+</ul>
+
+{% endblock %}

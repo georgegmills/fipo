@@ -1,0 +1,45 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+
+{% if meal.pk %}
+<form action="{% url 'meal_edit' meal.pk %}" method="post">
+{% else %}
+<form action="{% url 'meal_add' %}" method="post">
+{% endif %}
+
+{% csrf_token %}
+
+{% include "foodstuffs/form_snippet.html" with form=form %}
+
+{{ formset.management_form }}
+<div id="form_set">
+<table>
+{% for form in formset %}
+  {% include "foodstuffs/form_snippet.html" with form=form %}
+{% endfor %}
+</table>
+<div id="empty_form" style="display:none">
+    <table class='no_error'>
+      {% include "foodstuffs/form_snippet.html" with form=formset.empty_form %}
+    </table>
+</div>
+</div>
+<input type="button" value="Add More" id="add_more">
+<script>
+    $('#add_more').click(function() {
+        var form_idx = $('#id_form-TOTAL_FORMS').val();
+        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+        $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+</script>
+
+
+{% if meal.pk %}
+<input type="submit" name="submit" value="Save Meal">
+{% else %}
+<input type="submit" name="submit" value="Create Meal">
+{% endif %}
+
+</form>
+{% endblock %}

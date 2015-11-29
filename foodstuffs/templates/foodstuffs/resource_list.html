@@ -1,0 +1,17 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+<h1> Your Resources: </h1>
+<a href= "{% url 'resource_add' %}">Add A Resource</a>
+
+{% if resource_list %}
+
+<ul>
+{% for resource in resource_list %}
+<li><a href="{% url 'resource_detail' resource.pk %}">{{ resource.name }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}
+

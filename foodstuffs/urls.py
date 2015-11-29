@@ -11,6 +11,6 @@ urlpatterns = [
 
     url(r'^resources/add$', views.resource_edit, name='resource_add'),
     url(r'^resources/(?P<pk>\d+)/edit$', views.resource_edit, name='resource_edit'),
-    url(r'^resources/(?P<pk>\d+)/view$', views.MealDetailView.as_view(), name='resource_detail'),
-    url(r'^resources$', views.MealView.as_view(), name='resource_list'),o
+    url(r'^resources/(?P<pk>\d+)/view$', views.ResourceDetailView.as_view(), name='resource_detail'),
+    url(r'^resources$', views.ResourceView.as_view(), name='resource_list'),
 ]

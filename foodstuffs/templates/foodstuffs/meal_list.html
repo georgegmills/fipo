@@ -1,0 +1,16 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+<h1> Your Meals: </h1>
+<a href= "{% url 'meal_add' %}">Create Meal</a>
+
+{% if meal_list %}
+
+<ul>
+{% for meal in meal_list %}
+<li><a href="{% url 'meal_detail' meal.pk %}">{{ meal.name }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

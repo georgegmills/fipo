@@ -9,7 +9,7 @@ from django.views import generic
 
 from .models import Resource, Unit, Allergen, Meal, MealTime, Menu
 from .models import MealResourceRelationship,MenuMealRelationship,Trip
-from .forms import MealForm
+from .forms import MealForm, ResourceForm
 from django import forms
 import logging
 
@@ -31,13 +31,13 @@ class MealDetailView(generic.DetailView):
 
 
 def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
-    MealResourceFormset = forms.inlineformset_factory(Meal, Meal.resources.through, exclude=[], extra=1)
-
+    MealResourceFormset = forms.inlineformset_factory(Meal, Meal.resources.through, exclude=[], extra=0)
+    
     if pk:
         meal = get_object_or_404(Meal, pk=pk)
     else:
         meal = Meal()
-
+    
     # on POST, save
     if request.POST:
        meal_form = MealForm(request.POST, instance=meal)
@@ -47,10 +47,10 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
            # See: https://docs.djangoproject.com/en/1.8/topics/forms/modelforms/#the-save-method
            meal_mod = meal_form.save(commit=False)
            meal_mod.save()
-
-            
+                  
            # save resources
            resource_formset.save()
+           
            
            messages.add_message(request, messages.SUCCESS, _('Meal correctly saved.'))
            
@@ -60,8 +60,7 @@ def meal_edit(request, pk=None, template_name='foodstuffs/meal_edit.html'):
     else:
         meal_form = MealForm(instance=meal)
         resource_formset = MealResourceFormset(instance=meal)
-
-
+    
     args = {}
     args.update(csrf(request))
     args['form'] = meal_form
@@ -79,24 +78,26 @@ class ResourceDetailView(generic.DetailView):
     model=Resource
     template_name = 'foodstuffs/resource_detail.html'
 
-def resource_edit(request, pk=None,template_name='foodstuffs/resource_edit'):
+def resource_edit(request, pk=None,template_name='foodstuffs/resource_edit.html'):
     if pk:
         resource = get_object_or_404(Resource, pk=pk)
     else:
         resource = Resource()
+
 
     # on Post, save
     
     if request.POST:
         resource_form = ResourceForm(request.POST, instance=resource)
         if resource_form.is_valid():
-            resource_mod = meal_form.save(commit=False)
-            meal_mod.save()
+            resource_mod = resource_form.save(commit=False)
+            resource_mod.save()
+            resource_form.save_m2m()
 
             redirect_url = reverse('resource_list')
             return HttpResponseRedirect(redirect_url)
     else:
-        resource_form = ResourceForm(instance=meal)
+        resource_form = ResourceForm(instance=resource)
 
     args = {}
     args.update(csrf(request))

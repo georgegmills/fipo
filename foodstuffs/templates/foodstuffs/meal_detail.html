@@ -1,0 +1,17 @@
+{% extends "foodstuffs/base.html" %}
+
+{% block content %}
+<h1>{{ meal.name }}</h1>
+<a href= "{% url 'meal_edit' meal.pk %}">Edit Meal</a>
+
+
+<h2>Resources Required</h2>
+<table>
+  {% for resource in meal.mealresourcerelationship_set.all %}
+  {{ resource.resource.name }}: {{ resource.units_per_person }} {{ resource.resource.unit }} per person <br>
+  {% endfor %}
+</table>
+
+<h2>Recipe</h2>
+<p>{{ meal.recipe }}</p>
+{% endblock %}
